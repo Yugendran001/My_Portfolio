@@ -1,20 +1,19 @@
 'use client';
 
-import { useGLTF } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
-import { useRef } from 'react';
+import { useRef, useEffect } from 'react';
 import * as THREE from 'three';
-import { useScrollManager, sections } from '../dom/ScrollManager';
+import { useScrollManager } from '../dom/ScrollManager';
 import { gsap } from 'gsap';
 
 export const Character = () => {
-  const gltf = useGLTF('/models/character.glb');
   const modelRef = useRef<THREE.Group>(null);
   const { section } = useScrollManager();
 
   useFrame(({ clock }) => {
     if (modelRef.current) {
-      modelRef.current.position.y = Math.sin(clock.getElapsedTime()) * 0.1;
+      // Subtle floating animation
+      modelRef.current.position.y = -0.5 + Math.sin(clock.getElapsedTime()) * 0.1;
     }
   });
 
@@ -31,13 +30,13 @@ export const Character = () => {
   }, [section]);
 
   return (
-    <primitive 
-      ref={modelRef}
-      object={gltf.scene} 
-      position={[0, -0.5, 0]} 
-      scale={1.5}
-    />
+    // Placeholder for the character model
+    <group ref={modelRef} position={[0, -0.5, 0]} scale={1.5}>
+      <mesh>
+        <boxGeometry args={[0.5, 1, 0.5]} />
+        <meshStandardMaterial color="#00ffff" />
+      </mesh>
+    </group>
   );
 };
 
-useGLTF.preload('/models/character.glb');

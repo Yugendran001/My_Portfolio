@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useState } from 'react';
 import * as THREE from 'three';
 
 const SKILL_COUNT = 50;

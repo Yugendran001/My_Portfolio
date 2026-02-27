@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useEffect, useRef, useState } from 'react';
+import { createContext, useContext, useEffect, useRef, useState, MutableRefObject } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useThree } from '@react-three/fiber';
@@ -10,6 +10,8 @@ gsap.registerPlugin(ScrollTrigger);
 interface ScrollContextType {
   section: number;
   scrollTo: (section: number) => void;
+  timelineRef: MutableRefObject<gsap.core.Timeline | undefined>;
+  setSection: (section: number) => void;
 }
 
 const ScrollContext = createContext<ScrollContextType | undefined>(undefined);
@@ -25,22 +27,15 @@ export const sections = [
   { title: 'Deploy Me', cameraPos: [0, 1.5, -100] },
 ];
 
-export const ScrollManager = ({ children }: { children: React.ReactNode }) => {
+export const ScrollController = () => {
   const { camera } = useThree();
-  const [section, setSection] = useState(0);
-  const timeline = useRef<gsap.core.Timeline>();
-
-  const scrollTo = (index: number) => {
-    if (timeline.current) {
-      timeline.current.seek(`section-${index}`);
-    }
-  };
+  const { timelineRef, setSection } = useScrollManager();
 
   useEffect(() => {
-    timeline.current = gsap.timeline();
+    timelineRef.current = gsap.timeline();
 
     sections.forEach((sec, index) => {
-      timeline.current?.to(
+      timelineRef.current?.to(
         camera.position,
         {
           x: sec.cameraPos[0],
@@ -54,18 +49,39 @@ export const ScrollManager = ({ children }: { children: React.ReactNode }) => {
       );
     });
 
-    ScrollTrigger.create({
+    const st = ScrollTrigger.create({
       trigger: '#scroll-container',
       start: 'top top',
       end: 'bottom bottom',
       scrub: 0.1,
-      animation: timeline.current,
+      animation: timelineRef.current,
     });
 
-  }, [camera.position]);
+    return () => {
+      if (st) {
+        st.kill();
+      }
+      if (timelineRef.current) {
+        timelineRef.current.kill();
+      }
+    };
+  }, [setSection, timelineRef, camera]);
+
+  return null;
+};
+
+export const ScrollManager = ({ children }: { children: React.ReactNode }) => {
+  const timelineRef = useRef<gsap.core.Timeline>();
+  const [section, setSection] = useState(0);
+
+  const scrollTo = (index: number) => {
+    if (timelineRef.current) {
+      timelineRef.current.seek(`section-${index}`);
+    }
+  };
 
   return (
-    <ScrollContext.Provider value={{ section, scrollTo }}>
+    <ScrollContext.Provider value={{ section, scrollTo, timelineRef, setSection }}>
       {children}
     </ScrollContext.Provider>
   );

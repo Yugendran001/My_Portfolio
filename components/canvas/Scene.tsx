@@ -12,7 +12,7 @@ import { FieldOperations3D } from './FieldOperations3D';
 import { TrainingGrounds3D } from './TrainingGrounds3D';
 import { UnlockedAchievements3D } from './UnlockedAchievements3D';
 import { DeployMe3D } from './DeployMe3D';
-import { ScrollManager } from '../dom/ScrollManager';
+import { ScrollController } from '../dom/ScrollManager';
 
 export const Scene = () => {
   return (
@@ -21,18 +21,17 @@ export const Scene = () => {
       className="w-full h-full"
     >
       <Suspense fallback={null}>
-        <ScrollManager>
-          <Environment />
-          <GridFloor />
-          <Character />
-          <OriginStory3D />
-          <SkillTree3D />
-          <CompletedMissions3D />
-          <FieldOperations3D />
-          <TrainingGrounds3D />
-          <UnlockedAchievements3D />
-          <DeployMe3D />
-        </ScrollManager>
+        <ScrollController />
+        <Environment />
+        <GridFloor />
+        <Character />
+        <OriginStory3D />
+        <SkillTree3D />
+        <CompletedMissions3D />
+        <FieldOperations3D />
+        <TrainingGrounds3D />
+        <UnlockedAchievements3D />
+        <DeployMe3D />
       </Suspense>
     </Canvas>
   );
